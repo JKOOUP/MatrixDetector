@@ -34,7 +34,7 @@ class Recognizer:
 
         MORAN_state_dict_rename = OrderedDict()
         for k, v in state_dict.items():
-            name = k.replace("module.", "") # remove `module.`
+            name = k.replace("module.", "")
             MORAN_state_dict_rename[name] = v
         self.MORAN.load_state_dict(MORAN_state_dict_rename)
 
@@ -56,12 +56,9 @@ class Recognizer:
 
         if self.cuda_flag:
             img_batch = img_batch.cuda()
-        # img_batch = Variable(img_batch)
 
         text = torch.LongTensor(batch_size * 5)
         length = torch.IntTensor(batch_size)
-        # text = Variable(text)
-        # length = Variable(length)
 
         max_iter = 20
         t, l = self.converter.encode(['0' * max_iter] * batch_size)
@@ -73,12 +70,18 @@ class Recognizer:
 
     def post_process(self, output, length):
         preds, preds_reverse = output[0]
-        # demo = output[1]
+
+        n_preds = torch.zeros(preds.shape[0], dtype=torch.int)
+        for i, p in enumerate(preds):
+            if p.argmax() == 36:
+                n_preds[i] = 36
+            else:
+                n_preds[i] = int(p[:10].argmax())
 
         _, preds = preds.max(1)
         _, preds_reverse = preds_reverse.max(1)
 
-        sim_preds = self.converter.decode(preds.data, length.data)
+        sim_preds = self.converter.decode(n_preds.data, length.data)
         sim_preds = list(map(lambda x: x.strip().split('$')[0], sim_preds))
         sim_preds_reverse = self.converter.decode(preds_reverse.data, length.data)
         sim_preds_reverse = list(map(lambda x: x.strip().split('$')[0], sim_preds_reverse))
@@ -116,5 +119,10 @@ while True:
         break
     i += 1
 
-res = rec(images)
-print(res)
+result = rec(images)
+
+with open('./data/res/size.txt', 'r') as f:
+    h, w = map(int, f.readline().split())
+
+for i in range(h):
+    print(result[i * w: i * w + w])
