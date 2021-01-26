@@ -6,6 +6,7 @@ import time
 
 import cv2
 import numpy as np
+from PIL import Image
 import tensorflow as tf
 
 sys.path.append(os.getcwd())
@@ -18,7 +19,6 @@ tf.app.flags.DEFINE_string('output_path', 'data/res/', '')
 tf.app.flags.DEFINE_string('gpu', '0', '')
 tf.app.flags.DEFINE_string('checkpoint_path', 'checkpoints_mlt/', '')
 FLAGS = tf.app.flags.FLAGS
-
 
 def get_images():
     files = []
@@ -102,6 +102,16 @@ def main(argv=None):
 
                 cost_time = (time.time() - start)
                 print("cost time: {:.2f}s".format(cost_time))
+
+                for i, box in enumerate(boxes):
+                    lx, ly = box[0], box[1]
+                    rx, ry = box[4], box[5]
+
+                    pil_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                    pil_img = Image.fromarray(pil_img)
+                    
+                    cropped_img = np.array(pil_img)[ly:ry, lx:rx]
+                    Image.fromarray(cropped_img).save('./data/cropped/' + str(i) + '.png', 'PNG')
 
                 for i, box in enumerate(boxes):
                     cv2.polylines(img, [box[:8].astype(np.int32).reshape((-1, 1, 2))], True, color=(0, 255, 0),

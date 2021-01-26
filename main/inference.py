@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 from collections import OrderedDict
 from torch.autograd import Variable
 
+import os
+import sys
+sys.path.append(os.getcwd())
+
 import numpy as np
 import tools.utils as utils
 import tools.dataset as dataset
@@ -100,18 +104,17 @@ class Recognizer:
 
         return sim_preds
 
-rec = Recognizer('./BestMoran.pth')
+rec = Recognizer('./checkpoints_mlt/BestMoran.pth')
 
 i = 0
 images = []
 while True:
-    i += 1
     try:
-        img = np.array(Image.open('./demo/' + str(i) + '.png').convert('RGB'))
-        print("OK!")
+        img = np.array(Image.open('./data/cropped/' + str(i) + '.png').convert('RGB'))
         images.append(img)
     except:
         break
+    i += 1
 
 res = rec(images)
 print(res)

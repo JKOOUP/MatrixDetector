@@ -16,4 +16,11 @@ wget http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz
 tar -xvf vgg_16_2016_08_28.tar.gz
 rm -r /content/DLSProject/data/vgg_16_2016_08_28.tar.gz
 
+echo "Downloading recgnition model"
+cd ..
+gdown 'https://drive.google.com/uc?id=1a-0qujaO461ViSOl4GT6EgwH5uqc6xgO'
+
+cd ./data/
+mkdir cropped
+
 echo "All done"
