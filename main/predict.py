@@ -103,29 +103,53 @@ def main(argv=None):
                 cost_time = (time.time() - start)
                 print("cost time: {:.2f}s".format(cost_time))
 
+                elems = []
+                h = []
                 for i, box in enumerate(boxes):
                     lx, ly = box[0], box[1]
                     rx, ry = box[4], box[5]
+                    
+                    h.append(ry - ly)
+                    elems.append((ly, lx, ry, rx))                
+               
+                h = np.array(h).max() / 2
 
+                from operator import itemgetter
+                elems = sorted(elems, key=itemgetter(0, 1))
+                
+                elems_2d = [[elems[0]]]
+                idx = 0
+                for i in range(1, len(elems)):
+                    if (elems[i][0] - elems[i - 1][0] < h):
+                        elems_2d[idx].append(elems[i])
+                    else:
+                        elems_2d.append([elems[i]])
+                        idx += 1
+                
+                for i in range(len(elems_2d)):
+                    elems_2d[i].sort(key=itemgetter(1))
+                
+                elems = []
+                width = 0
+                for i in elems_2d:
+                    width = max(width, len(i))
+                    for j in i:
+                        elems.append(j)
+
+                for i, elem in enumerate(elems):
+                    ly = elem[0]
+                    lx = elem[1]
+                    ry = elem[2]
+                    rx = elem[3]
+                    
                     pil_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                     pil_img = Image.fromarray(pil_img)
                     
                     cropped_img = np.array(pil_img)[ly:ry, lx:rx]
                     Image.fromarray(cropped_img).save('./data/cropped/' + str(i) + '.png', 'PNG')
-
-                for i, box in enumerate(boxes):
-                    cv2.polylines(img, [box[:8].astype(np.int32).reshape((-1, 1, 2))], True, color=(0, 255, 0),
-                                  thickness=2)
-                img = cv2.resize(img, None, None, fx=1.0 / rh, fy=1.0 / rw, interpolation=cv2.INTER_LINEAR)
-                cv2.imwrite(os.path.join(FLAGS.output_path, os.path.basename(im_fn)), img[:, :, ::-1])
-
-                with open(os.path.join(FLAGS.output_path, os.path.splitext(os.path.basename(im_fn))[0]) + ".txt",
-                          "w") as f:
-                    for i, box in enumerate(boxes):
-                        line = ",".join(str(box[k]) for k in range(8))
-                        line += "," + str(scores[i]) + "\r\n"
-                        f.writelines(line)
-
+                      
+                with open('./data/res/size.txt', 'w') as f:
+                    f.write(str(len(elems_2d)) + ' ' + str(width))
 
 if __name__ == '__main__':
     tf.app.run()
