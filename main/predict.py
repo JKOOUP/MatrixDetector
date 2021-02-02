@@ -147,9 +147,12 @@ def main(argv=None):
                     
                     cropped_img = np.array(pil_img)[ly:ry, lx:rx]
                     Image.fromarray(cropped_img).save('./data/cropped/' + str(i) + '.png', 'PNG')
-                      
+
                 with open('./data/res/size.txt', 'w') as f:
-                    f.write(str(len(elems_2d)) + ' ' + str(width))
+                    f.write(str(len(elems_2d)))
+                    for i in range(len(elems_2d)):
+                        f.write('\n')
+                        f.write(str(len(elems_2d[i])))
 
 if __name__ == '__main__':
     tf.app.run()

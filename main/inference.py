@@ -121,8 +121,16 @@ while True:
 
 result = rec(images)
 
+w = []
 with open('./data/res/size.txt', 'r') as f:
-    h, w = map(int, f.readline().split())
+    h = int(f.readline())
+    for i in range(h):
+        w.append(int(f.readline()))
 
-for i in range(h):
-    print(result[i * w: i * w + w])
+idx = 0
+for i in range(len(result)):
+    print(result[i], end=' ')
+    w[idx] -= 1
+    if w[idx] == 0:
+        print()
+        idx += 1
