@@ -127,10 +127,11 @@ with open('./data/res/size.txt', 'r') as f:
     for i in range(h):
         w.append(int(f.readline()))
 
-idx = 0
-for i in range(len(result)):
-    print(result[i], end=' ')
-    w[idx] -= 1
-    if w[idx] == 0:
-        print()
-        idx += 1
+with open('./data/res/result.txt', 'w+') as f:
+    idx = 0
+    for i in range(len(result)):
+        f.write(str(result[i]) + ' ')
+        w[idx] -= 1
+        if w[idx] == 0:
+            f.write('\n')
+            idx += 1
