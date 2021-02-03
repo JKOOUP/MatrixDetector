@@ -127,11 +127,22 @@ with open('./data/res/size.txt', 'r') as f:
     for i in range(h):
         w.append(int(f.readline()))
 
+minuses = []
+with open('./data/res/minuses.txt', 'r') as f:
+    for i in range(len(result)):
+        minuses.append(int(f.readline()))
+
 with open('./data/res/result.txt', 'w+') as f:
     idx = 0
     for i in range(len(result)):
-        f.write(str(result[i]) + ' ')
+
+        tmp = str(result[i]) + ' '
+        if minuses[i] == -1:
+            tmp = '-' + tmp
+
+        f.write(tmp)
         w[idx] -= 1
+        
         if w[idx] == 0:
             f.write('\n')
             idx += 1
